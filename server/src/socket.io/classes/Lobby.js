@@ -1,0 +1,3 @@
+class Lobby {
+  constructor(io) {}
+}
