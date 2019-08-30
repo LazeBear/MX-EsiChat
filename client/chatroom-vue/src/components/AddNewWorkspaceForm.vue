@@ -31,12 +31,21 @@
           <b-field label="Pick a color">
             <Slider v-model="color"></Slider>
           </b-field>
-          <b-button type="is-primary" @click="submit" class="step-container__btn">Submit</b-button>
+          <b-button
+            type="is-primary"
+            @click="submit"
+            class="step-container__btn"
+            :loading="waitingResponse"
+          >Submit</b-button>
         </div>
       </div>
     </b-step-item>
     <b-step-item label="Submit" icon="check-outline">
-      <button @click="activeStep=0">test</button>
+      <div class="has-text-centered">
+        <div class="response-message">{{response.msg}}</div>
+        <b-button type="is-primary" v-if="response.success" @click="joinNow">Join now!</b-button>
+        <b-button type="is-primary" v-else @click="activeStep=0">Change info</b-button>
+      </div>
     </b-step-item>
   </b-steps>
 </template>
@@ -60,17 +69,32 @@ export default {
         oldHue: 251.37931034482762,
         source: "hsl",
         a: 1
-      }
+      },
+      waitingResponse: false,
+      response: { msg: "", success: false }
     };
+  },
+  watch: {
+    createNSResponse(res) {
+      if (res) {
+        this.response = res;
+        this.activeStep = 2;
+        this.waitingResponse = false;
+      }
+    }
   },
   methods: {
     submit() {
-      this.activeStep = 2;
+      this.waitingResponse = true;
       this.createNewWorkspace({
         name: this.name,
         description: this.description,
         color: this.color.hex
       });
+    },
+    joinNow() {
+      this.$parent.close();
+      this.joinWorkspace(this.response.ns);
     }
   },
   mixins: [mixin],
@@ -90,6 +114,9 @@ export default {
 
 .control {
   width: 100%;
+}
+.response-message {
+  margin: 30px 0;
 }
 .step-container {
   display: flex;

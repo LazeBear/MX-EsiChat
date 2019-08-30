@@ -4,6 +4,7 @@ const roomService = require('../services/room');
 const { fromClient, toClient } = require('./eventList');
 const Namespace = require('./classes/Namespace');
 const { validateToken } = require('../utils/jwt');
+const logger = require('../utils/logger');
 
 const namespaceMap = new Map();
 const namespaceList = [];
@@ -30,10 +31,13 @@ function startListening() {
         socket.user = decodedToken;
         if (users.has(decodedToken.name)) {
           // eliminate duplicate connections
-          return socket.disconnect();
+          // return socket.disconnect();
+          logger.warn(
+            'Multiple login detected with user: ' + decodedToken.name
+          );
         }
         users.add(socket.user.name);
-        console.log('user in lobby', [...users]);
+        logger.info('user joined lobby: ' + socket.user.name);
         socket.emit(toClient.namespaceList, namespaceList);
         return;
       }
@@ -41,10 +45,34 @@ function startListening() {
       socket.disconnect();
     });
 
-    socket.on(fromClient.createNamespace, async payload => {
-      console.log(payload);
-      const newNamespace = await namespaceService.createOne(payload);
-      await roomService.createOne({ name: 'general' }, newNamespace._id);
+    socket.on(fromClient.createNamespace, async (payload, cb) => {
+      let newNamespace;
+      const { id: user, name: createdBy } = socket.user;
+      try {
+        newNamespace = await namespaceService.createOne({
+          ...payload,
+          user,
+          createdBy
+        });
+      } catch (e) {
+        if (e.code === 11000) {
+          return cb({ success: false, msg: 'Workspace name already exist!' });
+        }
+        logger.error(e);
+        return cb({
+          success: false,
+          msg: 'Creation failed, please try later!'
+        });
+      }
+      cb({
+        success: true,
+        msg: `Workspace ${newNamespace.name} created!`,
+        ns: newNamespace
+      });
+      await roomService.createOne(
+        { name: 'general', user, createdBy },
+        newNamespace._id
+      );
       namespaceMap.set(newNamespace._id, new Namespace(newNamespace, io));
       namespaceList.push(newNamespace);
       io.emit(toClient.namespaceCreated, newNamespace);
@@ -53,7 +81,7 @@ function startListening() {
     socket.on('disconnect', () => {
       if (socket.user) {
         users.delete(socket.user.name);
-        console.log(socket.user.name + ' left');
+        logger.info('user left lobby: ' + socket.user.name);
       }
     });
   });

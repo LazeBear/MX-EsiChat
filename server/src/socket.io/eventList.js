@@ -16,5 +16,6 @@ exports.toClient = {
   newMsg: 'new message to client',
   askForAuthenticate: 'ask for authenticate',
   errorMsg: 'error message',
-  msgHistory: 'message history'
+  msgHistory: 'message history',
+  roomCreated: 'room created'
 };

@@ -3,7 +3,7 @@ const Service = require('./service');
 
 class RoomService extends Service {
   async createOne(room, namespaceId) {
-    const id = `${namespaceId}_${room.name.replace(/ /g, '-')}`;
+    const id = `${namespaceId}_${room.name.trim().replace(/ /g, '-')}`;
     const document = new this.Model({
       ...room,
       _id: id,
@@ -14,8 +14,9 @@ class RoomService extends Service {
   }
 
   async getRoomsByNS(ns) {
-    console.log(ns);
-    return this.Model.find({ namespace: ns }).exec();
+    return this.Model.find({ namespace: ns })
+      .lean()
+      .exec();
   }
 }
 

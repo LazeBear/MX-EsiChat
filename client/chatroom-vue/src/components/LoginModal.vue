@@ -57,8 +57,6 @@ export default {
   computed: {
     validateInput() {
       const usernameRegex = new RegExp("^[A-Za-z0-9]{1,10}$");
-      console.log(usernameRegex.test(this.username));
-      console.log(this.password.length >= 4);
       return usernameRegex.test(this.username) && this.password.length >= 4;
     }
   },

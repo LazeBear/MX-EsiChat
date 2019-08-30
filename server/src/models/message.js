@@ -10,7 +10,7 @@ const messageSchema = new mongoose.Schema({
   },
   name: { type: String },
   time: { type: Date, index: true },
-  room: { type: String, ref: 'Room' },
+  room: { type: String, ref: 'Room', index: true },
   __v: { type: Number, select: false }
 });
 

@@ -1,6 +1,6 @@
 <template>
   <div class="chat-area">
-    <div class="msg-area"></div>
+    <MsgArea class="msg-area"></MsgArea>
     <div class="input-area">
       <b-field>
         <b-input
@@ -16,6 +16,7 @@
 
 <script>
 import mixin from "../utils/mixin";
+import MsgArea from "./Message/MsgArea";
 export default {
   methods: {
     onSendMsg() {
@@ -28,7 +29,10 @@ export default {
       msg: ""
     };
   },
-  mixins: [mixin]
+  mixins: [mixin],
+  components: {
+    MsgArea
+  }
 };
 </script>
 
@@ -37,11 +41,12 @@ export default {
   flex: 1;
   display: flex;
   flex-direction: column;
+  margin: 10px;
   .msg-area {
     flex: 1;
   }
   .input-area {
-    margin: 10px;
+    margin-top: 10px;
   }
 }
 </style>

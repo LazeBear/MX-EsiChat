@@ -1,8 +1,13 @@
 <template>
   <div class="workspaces">
     <div v-for="workspace in workspaceList" :key="workspace._id">
-      <div class="avatar-wraper" @click="joinWorkspace(workspace._id)">
-        <Avatar :name="workspace.name" :color="workspace.color" :size="48"></Avatar>
+      <div class="avatar-wraper" @click="joinWorkspace(workspace)">
+        <Avatar
+          :name="workspace.name"
+          :class="currentNS === workspace.name?'active':''"
+          :color="workspace.color"
+          :size="48"
+        ></Avatar>
       </div>
     </div>
     <div @click="isModalActive = true">
@@ -40,14 +45,21 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: 15px;
+  padding: 15px 0;
+  overflow-y: scroll;
 }
 .add-workspace-btn {
   cursor: pointer;
   color: white;
+  margin-top: 5px;
 }
 
 .avatar-wraper {
   cursor: pointer;
+
+  .active {
+    border: 2px solid white;
+    border-radius: 5px;
+  }
 }
 </style>

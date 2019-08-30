@@ -10,6 +10,7 @@
     "axios": "^0.19.0",
     "buefy": "^0.8.2",
     "core-js": "^2.6.5",
+    "dayjs": "^1.8.16",
     "socket.io-client": "^2.2.0",
     "vue": "^2.6.10",
     "vue-avatar-component": "^1.2.6",

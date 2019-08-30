@@ -9,29 +9,37 @@ Vue.use(Vuex);
 
 function bindEventListener(context, socket) {
   socket.on(fromServer.namespaceList, payload => {
-    console.log('namelist', payload);
     toast.showSuccessToast('Login Success');
     context.commit('setWorkspaceList', payload);
   });
   socket.on(fromServer.namespaceCreated, payload => {
-    console.log('created', payload);
     context.commit('addWorkspace', payload);
   });
   socket.on(fromServer.roomList, rooms => {
-    console.log(rooms);
     context.commit('setRoomList', rooms);
   });
   socket.on(fromServer.roomHistory, rooms => {
-    console.log(rooms);
     context.commit('setRoomList', rooms);
   });
+  socket.on(fromServer.roomCreated, room => {
+    context.commit('addRoomList', room);
+  });
   socket.on(fromServer.newMsg, msg => {
-    console.log(msg);
+    context.commit('addRoomHistory', msg);
   });
   socket.on(fromServer.askForAuthenticate, cb => {
     const { token } = context.rootState.auth;
     cb(token);
   });
+
+  socket.on(fromServer.msgHistory, history => {
+    context.commit('setRoomHistory', history);
+  });
+
+  socket.on('connect_failed', () => {
+    toast.showErrorToast('socket connect failed');
+  });
+
   socket.on(fromServer.errorMsg, msg => {
     toast.showErrorToast(msg);
     socket.close();
@@ -39,34 +47,40 @@ function bindEventListener(context, socket) {
     context.commit('auth/setUser', null, { root: true });
   });
 
-  socket.on('connect_failed', () => {
-    console.log('connect failed');
-  });
   socket.on('disconnect', reason => {
     // transport close => server closed
     // ping timeout
-    console.log('connection lost', reason);
-    // socket.close();
+    // ignore this
+    // toast.showErrorToast(`connection lost due to: ${reason}`);
   });
 
   socket.on('error', msg => {
-    console.log('error event from server', msg);
-    // socket.close();
+    console.error('error event from server', msg);
     socket.open();
   });
 }
 
 export default new Vuex.Store({
   state: {
+    rootSocket: null,
     socket: null,
     workspaceList: [],
     roomList: [],
     roomHistory: [],
-    currentNS: null
+    currentNS: null,
+    currentRoom: null,
+    isLoading: false,
+    createNSResponse: null
   },
   getters: {
     socket: state => {
       return state.socket;
+    },
+    currentNS: state => {
+      return state.currentNS;
+    },
+    currentRoom: state => {
+      return state.currentRoom;
     },
     workspaceList: state => {
       return state.workspaceList;
@@ -76,14 +90,24 @@ export default new Vuex.Store({
     },
     roomHistory: state => {
       return state.roomHistory;
+    },
+    isLoading: state => {
+      return state.isLoading;
+    },
+    createNSResponse: state => {
+      return state.createNSResponse;
     }
   },
   mutations: {
+    setRootSocket: (state, rootSocket) => {
+      state.rootSocket = rootSocket;
+    },
     setSocket: (state, socket) => {
       state.socket = socket;
     },
     setWorkspaceList: (state, workspaceList) => {
       state.workspaceList = workspaceList;
+      state.isLoading = false;
     },
     addWorkspace: (state, workspace) => {
       state.workspaceList.push(workspace);
@@ -93,47 +117,92 @@ export default new Vuex.Store({
     },
     setRoomList: (state, roomList) => {
       state.roomList = roomList;
+      state.isLoading = false;
     },
     setRoomHistory: (state, roomHistory) => {
       state.roomHistory = roomHistory;
+      state.isLoading = false;
     },
-    resetHistory: state => {
+    setCurrentRoom: (state, currentRoom) => {
+      state.currentRoom = currentRoom;
+    },
+    loadingRoom: state => {
+      state.roomList = [];
+      state.isLoading = true;
+    },
+    loadingHistory: state => {
       state.roomHistory = [];
+      state.isLoading = true;
+    },
+    loadingWorkspace: state => {
+      state.workspaceList = [];
+      state.isLoading = true;
+    },
+    addRoomHistory: (state, history) => {
+      state.roomHistory.push(history);
+    },
+    addRoomList: (state, room) => {
+      state.roomList.push(room);
+    },
+    setCreateNSResponse: (state, createNSResponse) => {
+      state.createNSResponse = createNSResponse;
     }
   },
   actions: {
     connectToWS(context, workspace) {
-      let { socket, currentNS } = context.state;
-
-      if (socket && currentNS) {
-        socket.close();
-        context.state.socket = null;
+      let { rootSocket, socket: oldSocket } = context.state;
+      let socket;
+      if (rootSocket) {
+        if (oldSocket) oldSocket.close();
+        context.commit('setSocket', null);
+        socket = io(`${process.env.VUE_APP_SOCKET_URL}/${workspace._id}`);
+      } else {
+        context.commit('loadingWorkspace');
+        socket = io(process.env.VUE_APP_SOCKET_URL);
       }
-      socket = io(
-        `${process.env.VUE_APP_SOCKET_URL}${workspace ? `/${workspace}` : ''}`
-      );
-      socket.once('connect', tst => {
-        context.commit('setCurrentNS', workspace);
-        context.commit('setSocket', socket);
-        bindEventListener(context, socket);
+
+      socket.once('connect', () => {
+        if (rootSocket) {
+          context.commit('setCurrentNS', workspace.name);
+          context.commit('setCurrentRoom', null);
+          context.commit('setSocket', socket);
+          bindEventListener(context, socket);
+        } else {
+          context.commit('setRootSocket', socket);
+          bindEventListener(context, socket);
+        }
       });
     },
     createNewWorkspace(context, workspace) {
-      context.getters.socket.emit(toServer.createNamespace, workspace);
+      const { rootSocket } = context.state;
+      context.commit('setCreateNSResponse', null);
+      rootSocket.emit(toServer.createNamespace, workspace, res => {
+        context.commit('setCreateNSResponse', res);
+      });
     },
     joinWorkspace(context, workspace) {
-      console.log(workspace);
+      context.commit('loadingRoom');
       context.dispatch('connectToWS', workspace);
-      // context.getters.socket.emit(toServer.joinNamespace, workspace);
     },
     joinRoom(context, room) {
       const { socket } = context.state;
-      context.commit('resetHistory');
+      context.commit('setCurrentRoom', room);
+      context.commit('loadingHistory');
       socket.emit(toServer.joinRoom, room);
     },
     sendMsg(context, msg) {
       const { socket } = context.state;
       socket.emit(toServer.newMsg, msg);
+    },
+    createNewRoom(context, roomName) {
+      const { socket } = context.state;
+      socket.emit(toServer.createRoom, roomName, res => {
+        if (res.success) {
+          toast.showSuccessToast(res.msg);
+        } else {
+          toast.showErrorToast(res.msg);
+        }
+      });
     }
   },
   modules: {

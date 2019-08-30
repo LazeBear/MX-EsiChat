@@ -1,6 +1,6 @@
 const { toClient } = require('../eventList');
 const messageService = require('../../services/message');
-const Logger = require('../../utils/logger');
+const logger = require('../../utils/logger');
 
 class Room {
   constructor(roomObj, namespace) {
@@ -19,7 +19,6 @@ class Room {
     const history = await messageService.getMessageByRoom(this._id);
     this._history = [...history];
     this._historyFetched = true;
-    console.log(history);
   }
 
   saveHistoryToDBInterval() {
@@ -28,7 +27,7 @@ class Room {
         messageService.bulkInsert([...this._historyToBeSaved]);
         this._historyToBeSaved = [];
       }
-    }, 10000);
+    }, 60000);
   }
 
   async getHistory() {
@@ -40,11 +39,11 @@ class Room {
 
   broadcast(payload) {
     if (!this._historyFetched) {
-      Logger.error('Room: history is not fetched yet!');
+      logger.error('Room: history is not fetched yet!');
       return;
     }
     const message = this.addStamp(payload);
-
+    this.saveHistory(message);
     this._transmitter.emit(toClient.newMsg, message);
   }
 
@@ -55,7 +54,7 @@ class Room {
 
   saveHistory(message) {
     this._history.push(message);
-    this.__historyToBeSaved.push(message);
+    this._historyToBeSaved.push(message);
     if (this._historyToBeSaved.length >= 100) {
       messageService.bulkInsert([...this._historyToBeSaved]);
       this._historyToBeSaved = [];

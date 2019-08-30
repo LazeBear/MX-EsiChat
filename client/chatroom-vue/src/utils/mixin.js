@@ -6,7 +6,12 @@ export default {
       workspaceList: 'workspaceList',
       roomList: 'roomList',
       isLoggingIn: 'auth/isLoggingIn',
-      user: 'auth/user'
+      user: 'auth/user',
+      roomHistory: 'roomHistory',
+      isLoading: 'isLoading',
+      currentNS: 'currentNS',
+      currentRoom: 'currentRoom',
+      createNSResponse: 'createNSResponse'
     })
   },
   methods: {
@@ -18,7 +23,8 @@ export default {
       sendMsg: 'sendMsg',
       login: 'auth/login',
       register: 'auth/register',
-      checkAuth: 'auth/checkAuth'
+      checkAuth: 'auth/checkAuth',
+      createNewRoom: 'createNewRoom'
     })
   }
 };

@@ -4,7 +4,9 @@ class Service {
   }
 
   async getAll() {
-    return this.Model.find().exec();
+    return this.Model.find()
+      .lean()
+      .exec();
   }
 
   // populate should be an object like this {key1: selected_field, k2: s_f}

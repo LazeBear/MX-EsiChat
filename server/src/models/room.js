@@ -15,6 +15,11 @@ const roomSchema = new mongoose.Schema(
       type: Boolean,
       default: false
     },
+    user: {
+      type: String,
+      ref: 'User'
+    },
+    createdBy: { type: String },
     namespace: { type: String, ref: 'Namespace' },
     __v: { type: Number, select: false }
   },

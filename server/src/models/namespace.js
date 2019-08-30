@@ -27,6 +27,11 @@ const namespaceSchema = new mongoose.Schema(
       minlength: 1,
       maxlength: 6
     },
+    user: {
+      type: String,
+      ref: 'User'
+    },
+    createdBy: { type: String },
     __v: { type: Number, select: false }
   },
   {

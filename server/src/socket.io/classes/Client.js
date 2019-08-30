@@ -1,3 +1,5 @@
+const logger = require('../../utils/logger');
+
 class Client {
   constructor(user, socket) {
     this._socket = socket;
@@ -9,7 +11,7 @@ class Client {
 
   sendMsgToRoom(msg) {
     if (!this._room) {
-      console.error('no room !!!');
+      logger.error('No room exist');
       return;
     }
     this._room.broadcast({ name: this.name, content: msg, user: this._id });
@@ -29,7 +31,7 @@ class Client {
     }
     this._socket.leave(this._roomId);
     this._room = null;
-    return room;
+    return this._roomId;
   }
 }
 module.exports = Client;

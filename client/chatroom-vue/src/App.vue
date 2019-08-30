@@ -1,8 +1,8 @@
 <template>
-  <div class="app-content">
+  <div class="app-content" v-if="user">
     <Workspaces></Workspaces>
-    <Rooms></Rooms>
-    <ChatArea></ChatArea>
+    <Rooms v-if="currentNS"></Rooms>
+    <ChatArea v-if="currentRoom"></ChatArea>
   </div>
 </template>
 
@@ -20,6 +20,11 @@ export default {
     ChatArea
   },
   mixins: [mixin],
+  data() {
+    return {
+      loadingComponent: null
+    };
+  },
   mounted() {
     this.checkAuth();
     this.showLoginModal();
@@ -29,6 +34,13 @@ export default {
       if (!val) {
         this.showLoginModal();
       }
+    },
+    isLoading(val) {
+      if (val) {
+        this.showLoading();
+      } else {
+        this.closeLoading();
+      }
     }
   },
   methods: {
@@ -37,9 +49,16 @@ export default {
         parent: this,
         component: LoginModal,
         hasModalCard: true,
-        canCancel: false,
-        customClass: "custom-class custom-class-2"
+        canCancel: false
       });
+    },
+    showLoading() {
+      this.loadingComponent = this.$buefy.loading.open({
+        container: null
+      });
+    },
+    closeLoading() {
+      setTimeout(() => this.loadingComponent.close(), 500);
     }
   }
 };
