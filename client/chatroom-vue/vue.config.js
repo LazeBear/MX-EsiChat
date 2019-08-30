@@ -1,6 +1,5 @@
 const path = require('path');
 
 module.exports = {
-  outputDir: path.resolve(__dirname, '../../server/public'),
-  assetsDir: '../../server/public'
+  outputDir: path.resolve(__dirname, '../../server/public')
 };

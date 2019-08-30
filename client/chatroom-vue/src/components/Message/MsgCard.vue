@@ -25,7 +25,7 @@ export default {
   },
   computed: {
     time() {
-      return dayjs(this.msg.time).format("h:m A - D MMM");
+      return dayjs(this.msg.time).format("h:mm A - D MMM");
     }
   }
 };
