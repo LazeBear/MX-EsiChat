@@ -1,0 +1,25 @@
+{
+  "name": "chatroom",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "server": "cd ./server && npm run dev",
+    "client": "cd ./client/chatroom-vue && npm run dev",
+    "dev": "concurrently \"npm run server\" \"npm run client\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LazeBear/MX-EsiChat.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/LazeBear/MX-EsiChat/issues"
+  },
+  "homepage": "https://github.com/LazeBear/MX-EsiChat#readme",
+  "devDependencies": {
+    "concurrently": "^4.1.2"
+  }
+}
