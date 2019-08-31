@@ -23,6 +23,6 @@ export default {
 
 <style lang="scss" scoped>
 .msg-area {
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 </style>

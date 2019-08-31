@@ -46,7 +46,7 @@ export default {
   flex-direction: column;
   align-items: center;
   padding: 15px 0;
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 .add-workspace-btn {
   cursor: pointer;

@@ -81,4 +81,7 @@ export default {
   width: 100vw;
   overflow: hidden;
 }
+.modal-card {
+  margin: 0 auto !important;
+}
 </style>

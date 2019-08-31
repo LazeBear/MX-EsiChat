@@ -50,7 +50,7 @@ export default {
   text-overflow: ellipsis;
 }
 .room-list {
-  overflow-y: scroll;
+  overflow-y: auto;
   flex: 1;
 }
 .rooms {
