@@ -49,7 +49,6 @@ class Room {
     }
     const message = this.addStamp(payload);
     this.saveHistory(message);
-    logger.error('id is ' + this._id);
     this.getTransmitter().emit(toClient.newMsg, message);
   }
 

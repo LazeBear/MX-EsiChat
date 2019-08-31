@@ -20,6 +20,9 @@ import MsgArea from "./Message/MsgArea";
 export default {
   methods: {
     onSendMsg() {
+      if (this.msg.trim().length === 0) {
+        return;
+      }
       this.sendMsg(this.msg);
       this.msg = "";
     }

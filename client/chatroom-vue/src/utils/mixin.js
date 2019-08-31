@@ -11,7 +11,8 @@ export default {
       isLoading: 'isLoading',
       currentNS: 'currentNS',
       currentRoom: 'currentRoom',
-      createNSResponse: 'createNSResponse'
+      createNSResponse: 'createNSResponse',
+      hideMenu: 'hideMenu'
     })
   },
   methods: {
@@ -24,7 +25,8 @@ export default {
       login: 'auth/login',
       register: 'auth/register',
       checkAuth: 'auth/checkAuth',
-      createNewRoom: 'createNewRoom'
+      createNewRoom: 'createNewRoom',
+      setHideMenu: 'setHideMenu'
     })
   }
 };

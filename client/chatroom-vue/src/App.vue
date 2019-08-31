@@ -1,12 +1,14 @@
 <template>
   <div class="app-content" v-if="user">
-    <Workspaces></Workspaces>
-    <Rooms v-if="currentNS"></Rooms>
+    <Workspaces v-if="!hideMenu"></Workspaces>
+    <Rooms v-if="currentNS && !hideMenu"></Rooms>
+    <HideMenu></HideMenu>
     <ChatArea v-if="currentRoom"></ChatArea>
   </div>
 </template>
 
 <script>
+import HideMenu from "./components/HideMenu";
 import Workspaces from "./components/Workspaces";
 import Rooms from "./components/Rooms";
 import LoginModal from "./components/LoginModal";
@@ -17,7 +19,8 @@ export default {
   components: {
     Workspaces,
     Rooms,
-    ChatArea
+    ChatArea,
+    HideMenu
   },
   mixins: [mixin],
   data() {

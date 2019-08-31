@@ -70,7 +70,8 @@ export default new Vuex.Store({
     currentNS: null,
     currentRoom: null,
     isLoading: false,
-    createNSResponse: null
+    createNSResponse: null,
+    hideMenu: false
   },
   getters: {
     socket: state => {
@@ -84,6 +85,9 @@ export default new Vuex.Store({
     },
     workspaceList: state => {
       return state.workspaceList;
+    },
+    hideMenu: state => {
+      return state.hideMenu;
     },
     roomList: state => {
       return state.roomList;
@@ -99,6 +103,9 @@ export default new Vuex.Store({
     }
   },
   mutations: {
+    setHideMenu: (state, hideMenu) => {
+      state.hideMenu = hideMenu;
+    },
     setRootSocket: (state, rootSocket) => {
       state.rootSocket = rootSocket;
     },
@@ -173,6 +180,9 @@ export default new Vuex.Store({
         }
       });
     },
+    setHideMenu: (context, bool) => {
+      context.commit('setHideMenu', bool);
+    },
     createNewWorkspace(context, workspace) {
       const { rootSocket } = context.state;
       context.commit('setCreateNSResponse', null);
@@ -188,6 +198,10 @@ export default new Vuex.Store({
       const { socket } = context.state;
       context.commit('setCurrentRoom', room);
       context.commit('loadingHistory');
+      if (window.innerWidth < 700) {
+        context.commit('setHideMenu', true);
+      }
+
       socket.emit(toServer.joinRoom, room);
     },
     sendMsg(context, msg) {
