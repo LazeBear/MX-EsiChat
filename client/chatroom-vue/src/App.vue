@@ -84,4 +84,12 @@ export default {
 .modal-card {
   margin: 0 auto !important;
 }
+::-webkit-scrollbar {
+  width: 2px; /* Remove scrollbar space */
+  background: transparent; /* Optional: just make scrollbar invisible */
+}
+/* Optional: show position indicator in red */
+::-webkit-scrollbar-thumb {
+  background: #714cd3;
+}
 </style>
