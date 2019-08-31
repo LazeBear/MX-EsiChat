@@ -56,7 +56,7 @@ export default {
 .rooms {
   min-width: 240px;
   max-width: 240px;
-  background-color: #111;
+  background-color: #333;
   display: flex;
   flex-direction: column;
   padding: 15px 0;

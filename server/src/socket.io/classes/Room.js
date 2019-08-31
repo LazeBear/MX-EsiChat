@@ -9,10 +9,15 @@ class Room {
     this._history = [];
     this._historyToBeSaved = [];
     this._historyFetched = false;
-    // it's a transmitter because it can only emit, cannot listen
-    this._transmitter = namespace.getTransceiver().to(this._id);
+    this._transceiver = namespace.getTransceiver();
     this.saveHistoryToDBInterval();
     this.getHistoryFromDB();
+  }
+
+  getTransmitter() {
+    // it's a transmitter because it can only emit, cannot listen
+
+    return this._transceiver.to(this._id);
   }
 
   async getHistoryFromDB() {
@@ -44,7 +49,8 @@ class Room {
     }
     const message = this.addStamp(payload);
     this.saveHistory(message);
-    this._transmitter.emit(toClient.newMsg, message);
+    logger.error('id is ' + this._id);
+    this.getTransmitter().emit(toClient.newMsg, message);
   }
 
   addStamp(payload) {

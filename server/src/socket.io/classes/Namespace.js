@@ -43,8 +43,8 @@ class Namespace {
   async startListening() {
     await this.prepareRooms();
     logger.info(`NS ${this._id} start listening`);
-    let client;
     this._transceiver.on('connection', socket => {
+      let client;
       const authTimeout = setTimeout(() => {
         socket.emit(toClient.errorMsg, 'Authentication failed');
         socket.disconnect();
